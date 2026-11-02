@@ -59,6 +59,51 @@ public final class UltraHdRaw {
         }
     }
 
+    /**
+     * After "the camera supports Ultra RAW": not on the ultra-wide and telephoto at 50MP. Their
+     * Ultra RAW session (0x900c) asks for a full-size RAW16 stream (8160x6120) the HAL refuses
+     * ("Invalid streamType ... format: 32"), so Pro couldn't open the camera; RAW (0x9007) works.
+     */
+    public static boolean ultraRawSupported(boolean supported, Object caps, String cameraId, String ultra) {
+        if (!supported) return false;
+        try {
+            if (lensCamera(caps, cameraId) && UltraHdLenses.ultraHdNow(ultra)) {
+                Log.once("ultra raw: Ultra RAW off on the ultra-wide and telephoto at 50MP");
+                return false;
+            }
+        } catch (Throwable t) {
+            Log.once("ultra raw: Ultra RAW check", t);
+        }
+        return supported;
+    }
+
+    private static final ThreadLocal<Boolean> READING_ITEMS = new ThreadLocal<>();
+
+    /**
+     * After the RAW format component's value: a saved "Ultra RAW" the current lens no longer
+     * offers (at 50MP on the ultra-wide and telephoto) reads as "RAW"; the camera itself throws
+     * on a value that isn't among the items.
+     */
+    public static String rawFormat(String value, Object component) {
+        if (!"Ultra RAW".equals(value) || component == null || Boolean.TRUE.equals(READING_ITEMS.get())) return value;
+        READING_ITEMS.set(Boolean.TRUE);
+        try {
+            Object items = component.getClass().getMethod("getItems").invoke(component);
+            if (!(items instanceof List)) return value;
+            // The item class is obfuscated; its toString names the value ("mValue='RAW'").
+            for (Object item : (List<?>) items) {
+                if (String.valueOf(item).contains("mValue='" + value + "'")) return value;
+            }
+            Log.once("ultra raw: saved Ultra RAW read as RAW where it isn't offered");
+            return "RAW";
+        } catch (Throwable t) {
+            Log.once("ultra raw: format items", t);
+            return value;
+        } finally {
+            READING_ITEMS.remove();
+        }
+    }
+
     static boolean lensCamera(Object caps, String cameraId) throws Exception {
         String[] n = cameraId.split("#");
         Object id = UltraHdLenses.method(n[0], n[1]).invoke(null, caps);

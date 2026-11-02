@@ -3,6 +3,7 @@
 ## 1.9.4
 
 - Continuous zoom works in Pro video (and Video) again with 50M switched on in Pro photo. The 50MP lens fixes read Pro's 50M setting whatever the mode and held the main camera at 1x; they now act only in Photo and Pro photo.
+- Pro no longer fails to open after picking Ultra RAW on the ultra-wide or telephoto at 50M. The houji HAL has no 50MP Ultra RAW stream on those lenses, so the session failed and Pro kept reopening into the same setting. Ultra RAW is now offered there only at 12MP, and a saved Ultra RAW reads as RAW where it isn't offered.
 - Preliminary HyperOS and xiaomi.eu support (untested): the module installs with Magisk as well as KernelSU, finds the ROM's camera in `/system` or `/product`, and on HyperOS skips the AOSP extras (icon overlay, MIUI Gallery); the LSPosed module leaves the client name, recorder output, haptics and Movie's audio to HyperOS. See docs/hyperos.md. The installer also stops if camera updates are installed on top of the system camera, since they hide the replacement, and recognises the Xiaomi 14 from any of its device or boot properties (xiaomi.eu's HyperOS 3 reports its vendor as `mivendor`). With official KernelSU, which can't set app profiles from a script, it tells you to turn off the Camera's "Umount modules" by hand; without that the camera closes on start.
 
 ## 1.9.3

@@ -2206,6 +2206,56 @@
    ]
   },
   {
+   "id": "ultra-raw-urw",
+   "hook": "UltraHdRaw (no Ultra RAW on the ultra-wide and telephoto at 50MP)",
+   "effort": "medium",
+   "find": {
+    "class": "Ll9/h;",
+    "name": "g4",
+    "proto": "(Ll9/g;)Z",
+    "static": true
+   },
+   "action": {
+    "type": "wrap",
+    "after": [
+     {
+      "helper": "Ldev/spundone/xcam17/aosp/UltraHdRaw;->ultraRawSupported(ZLjava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Z",
+      "pass": [
+       "result",
+       "arg0",
+       "str:l9.h#j",
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "ultra-raw-saved",
+   "hook": "UltraHdRaw (a saved Ultra RAW reads as RAW where it isn't offered)",
+   "effort": "medium",
+   "find": {
+    "class": "Lr2/U;",
+    "name": "getComponentValue",
+    "proto": "(I)Ljava/lang/String;",
+    "has": [
+     "\"pref_camera_raw_key\""
+    ]
+   },
+   "action": {
+    "type": "wrap",
+    "after": [
+     {
+      "helper": "Ldev/spundone/xcam17/aosp/UltraHdRaw;->rawFormat(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/String;",
+      "pass": [
+       "result",
+       "this"
+      ]
+     }
+    ]
+   }
+  },
+  {
    "id": "dng-50",
    "hook": "Dng50 (DNG of 50MP and cropped RAW frames)",
    "effort": "medium",

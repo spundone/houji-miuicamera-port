@@ -64,6 +64,7 @@ final class UltraHdRaw {
                 }
             });
             hookProRawSize(cl, build, caps, cameraId, characteristics);
+            hookUltraRaw(cl, build, caps, cameraId);
             Entry.log("ultra raw: 50MP RAW offered on the ultra-wide and telephoto");
         } catch (Throwable t) {
             Entry.log("ultra raw: not hooked: " + t);
@@ -92,6 +93,52 @@ final class UltraHdRaw {
                 if (!contains(CAMERAS, (Integer) cameraId.invoke(null, p.thisObject))) return;
                 Size full = fullRaw((CameraCharacteristics) characteristics.get(p.thisObject));
                 if (full != null) p.setResult(full);
+            }
+        });
+    }
+
+    /**
+     * "The camera supports Ultra RAW" answers no on the ultra-wide and telephoto at 50MP: their
+     * Ultra RAW session (0x900c) asks for a full-size RAW16 stream (8160x6120) the HAL refuses
+     * ("Invalid streamType ... format: 32"), so Pro couldn't open the camera. RAW (0x9007) works.
+     */
+    static void hookUltraRaw(ClassLoader cl, CameraBuild build, Class<?> caps, Method cameraId) throws Exception {
+        if (build.ultraRawSupportedMethod == null) return;
+        Method supported = cl.loadClass(build.cameraIdClass).getDeclaredMethod(build.ultraRawSupportedMethod, caps);
+        Method ultraOn = cl.loadClass(build.ultraOnClass).getDeclaredMethod(build.ultraOnMethod);
+        if (supported.getReturnType() != boolean.class) {
+            Entry.log("ultra raw: Ultra RAW check has an unexpected shape, skipping");
+            return;
+        }
+        XposedBridge.hookMethod(supported, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam p) throws Throwable {
+                if (!Boolean.TRUE.equals(p.getResult())) return;
+                if (!contains(CAMERAS, (Integer) cameraId.invoke(null, p.args[0]))) return;
+                if (UltraHdLenses.ultraHdNow(ultraOn)) p.setResult(false);
+            }
+        });
+        if (build.rawFormatClass == null) return;
+        // A saved "Ultra RAW" the lens no longer offers reads as "RAW"; the camera throws on a
+        // value that isn't among the items. The item class is obfuscated; its toString names the value.
+        Class<?> format = cl.loadClass(build.rawFormatClass);
+        XposedBridge.hookMethod(format.getDeclaredMethod("getComponentValue", int.class), new XC_MethodHook() {
+            private final ThreadLocal<Boolean> reading = new ThreadLocal<>();
+
+            @Override
+            protected void afterHookedMethod(MethodHookParam p) throws Throwable {
+                if (!"Ultra RAW".equals(p.getResult()) || Boolean.TRUE.equals(reading.get())) return;
+                reading.set(Boolean.TRUE);
+                try {
+                    Object items = format.getMethod("getItems").invoke(p.thisObject);
+                    if (!(items instanceof List)) return;
+                    for (Object item : (List<?>) items) {
+                        if (String.valueOf(item).contains("mValue='Ultra RAW'")) return;
+                    }
+                    p.setResult("RAW");
+                } finally {
+                    reading.remove();
+                }
             }
         });
     }

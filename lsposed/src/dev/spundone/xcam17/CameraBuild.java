@@ -151,6 +151,9 @@ final class CameraBuild {
      */
     final String rawSizesMethod;
     final String proRawSizeMethod;
+    /** In the checks class: "the camera supports Ultra RAW" (caps), and the RAW format component; or null. */
+    final String ultraRawSupportedMethod;
+    final String rawFormatClass;
     /**
      * For {@link NaturalStyle}, or null: the style component's list builder (data), the data's
      * mode field, and the static "Original style supported" check (caps) in the checks class.
@@ -268,6 +271,8 @@ final class CameraBuild {
         this.teleSupportedMethod = settings == null || settings.length < 4 ? null : settings[3];
         this.rawSizesMethod = settings == null || settings.length < 5 ? null : settings[4];
         this.proRawSizeMethod = settings == null || settings.length < 6 ? null : settings[5];
+        this.ultraRawSupportedMethod = settings == null || settings.length < 7 ? null : settings[6];
+        this.rawFormatClass = settings == null || settings.length < 8 ? null : settings[7];
         this.styleListClass = portraitStyle == null ? null : portraitStyle[0];
         this.styleListMethod = portraitStyle == null ? null : portraitStyle[1];
         this.styleListModeField = portraitStyle == null ? null : portraitStyle[2];
@@ -305,7 +310,7 @@ final class CameraBuild {
                     new String[] {"r2.b0", "o", "c"},
                     new String[] {"Q0", "X0", "J0", "Re.b"},
                     new String[] {"r2.g0", "C", "l9.h", "f2"},
-                    new String[] {"Xh.a", "h", "S0", "r5", "j0", "s"},
+                    new String[] {"Xh.a", "h", "S0", "r5", "j0", "s", "g4", "r2.U"},
                     new String[] {"t7.d", "a", "Sh.t", "a", "b", "e", "f", "Q", "i", "g", "c",
                             "Vh.f", "d", "Vh.g", "a", "r2.B", "k6.l", "T", "l9.a", "B"},
                     new String[] {"r2.m", "u", "a", "E2"}),

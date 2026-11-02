@@ -334,6 +334,17 @@ add("ultra-raw-pro-size", "UltraHdRaw (Pro's RAW size at 50MP)", "medium",
                                          "str:com.android.camera.data.data.p#l0"]}]},
     [CAPS_CHECK, ULTRA_CHECK])
 
+add("ultra-raw-urw", "UltraHdRaw (no Ultra RAW on the ultra-wide and telephoto at 50MP)", "medium",
+    {"class": "Ll9/h;", "name": "g4", "proto": "(Ll9/g;)Z", "static": True},
+    {"type": "wrap", "after": [{"helper": H + "UltraHdRaw;->ultraRawSupported(ZLjava/lang/Object;"
+                                          "Ljava/lang/String;Ljava/lang/String;)Z",
+                                "pass": ["result", "arg0", CAMERA_ID, ULTRA]}]})
+
+add("ultra-raw-saved", "UltraHdRaw (a saved Ultra RAW reads as RAW where it isn't offered)", "medium",
+    {"class": "Lr2/U;", "name": "getComponentValue", "proto": "(I)Ljava/lang/String;", "has": ['"pref_camera_raw_key"']},
+    {"type": "wrap", "after": [{"helper": H + "UltraHdRaw;->rawFormat(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/String;",
+                                "pass": ["result", "this"]}]})
+
 add("dng-50", "Dng50 (DNG of 50MP and cropped RAW frames)", "medium", None, {
     "type": "redirect", "helper": H + "Dng50;",
     "calls": {
