@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.2
+
+- Fixed a boot loop on ROMs that enforce the privileged-permission allowlist. Camera 6.8 asks for a privileged permission (`START_TASKS_FROM_RECENTS`) that the ROM's allowlist for the old camera doesn't include, and those ROMs stop booting over it. The module now sets `ro.control_privapp_permissions=log`, as the MIUI Gallery module does, so the missing entry is only logged. On ROMs that already log (such as Infinity X) nothing changes.
+- Shorter module descriptions in the KernelSU manager.
+
 ## 1.9.1
 
 Fixes for the MIUI Gallery Global module, used alongside the camera (and installed by the KernelSU-only gallery zips):

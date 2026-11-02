@@ -1,0 +1,4 @@
+# Camera 6.8 asks for privileged permissions the ROM's allowlist for the old camera lacks
+# (START_TASKS_FROM_RECENTS on houji's MiuiCamera trees). ROMs that enforce the allowlist stop
+# booting over it, so missing entries are only logged.
+ro.control_privapp_permissions=log
