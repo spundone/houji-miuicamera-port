@@ -6,8 +6,18 @@ SKIPUNZIP=0
 
 ui_print "- MiuiCamera port for the Xiaomi 14 (houji)"
 
-device=$(getprop ro.product.vendor.device)
-[ "$device" = "houji" ] || abort "! This module is for the Xiaomi 14 (houji); this phone is '$device'"
+# ROMs name the device differently (xiaomi.eu's HyperOS 3 vendor reports "mivendor"), so any
+# of these naming houji will do; the boot properties come from the bootloader.
+is_houji=""
+for p in ro.product.vendor.device ro.product.device ro.product.system.device ro.build.product \
+    ro.product.mod_device ro.boot.hardware.revision ro.boot.hardware.sku ro.bootimage.build.fingerprint; do
+    case "$(getprop "$p")" in
+        houji*|*/houji/*) is_houji=1 ;;
+    esac
+done
+if [ -z "$is_houji" ]; then
+    abort "! This module is for the Xiaomi 14 (houji); this phone reports '$(getprop ro.product.device)' / '$(getprop ro.product.vendor.device)' / '$(getprop ro.boot.hardware.revision)'"
+fi
 [ "$KSU" = "true" ] || [ -n "$MAGISK_VER_CODE" ] || abort "! KernelSU or Magisk is required"
 [ "$(getprop ro.build.version.sdk)" -ge 35 ] || abort "! Android 15 or newer is required"
 
