@@ -19,7 +19,7 @@ With 6.8 you get the newer interface, Leica styles and filters, film grain, 50MP
 | --- | --- | --- |
 | A rooted user | The KernelSU module from [Releases](https://github.com/spundone/houji-miuicamera-port/releases), which installs an LSPosed module | KernelSU (or KernelSU Next) and an LSPosed framework (Vector or LSPosed); the camera APK in `Download` |
 | A rooted user without LSPosed | A KernelSU-only zip you build yourself ([Build](#build)) | KernelSU only. The zip carries the patched camera, so it is never published |
-| On HyperOS or xiaomi.eu (preliminary, untested) | The same module zip, or the camera APK installed as an update, plus the LSPosed module ([docs/hyperos.md](docs/hyperos.md)) | KernelSU or Magisk, and an LSPosed framework |
+| On HyperOS or xiaomi.eu (reported working on xiaomi.eu HyperOS 3; stock HyperOS untested) | The same module zip, or the camera APK installed as an update, plus the LSPosed module ([docs/hyperos.md](docs/hyperos.md)) | KernelSU or Magisk, and an LSPosed framework |
 | A ROM maintainer | [android_device_xiaomi_houji-miuicamera-port](https://github.com/spundone/android_device_xiaomi_houji-miuicamera-port), a device tree with the patched APK and Leica Essential | A houji tree that includes the 6.4 houji-miuicamera trees |
 
 All three apply the same fixes. The KernelSU module hooks the camera at runtime with LSPosed; the other two use a copy of the camera patched ahead of time by [`aosp/`](aosp/README.md).
@@ -123,7 +123,7 @@ Pushing a `v*` tag that matches `VERSION` makes GitHub Actions build and publish
 - [aosp/README.md](aosp/README.md) and [docs/aosp-integration.md](docs/aosp-integration.md): the patcher and building the camera into a ROM
 - [docs/roadmap.md](docs/roadmap.md): what's missing and what to try next
 - [docs/miui-gallery.md](docs/miui-gallery.md): the MIUI Gallery module used alongside
-- [docs/hyperos.md](docs/hyperos.md): the LSPosed module on HyperOS (preliminary)
+- [docs/hyperos.md](docs/hyperos.md): the LSPosed module on HyperOS and xiaomi.eu
 
 ## Legal
 

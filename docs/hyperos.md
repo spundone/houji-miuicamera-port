@@ -1,6 +1,6 @@
-# HyperOS (preliminary)
+# HyperOS
 
-Camera 6.8.002090.2 on the Xiaomi 14 (houji) running HyperOS, with the LSPosed module. **Untested**: written from how the camera behaves on AOSP ROMs and how HyperOS differs. Reports welcome, with the log lines described below.
+Camera 6.8.002090.2 on the Xiaomi 14 (houji) running HyperOS, with the LSPosed module. **Reported working on xiaomi.eu (HyperOS 3)** with 1.9.4's module zip carrying the camera APK. Stock HyperOS and the install-as-update route are untested. Reports welcome, with the log lines described below.
 
 ## How it differs from AOSP ROMs
 
