@@ -200,6 +200,15 @@ fi
 # Android caches parsed packages by path; drop the cached 6.4 so the new APK is read.
 clear_camera_package_cache
 
+# KernelSU hides module files from apps unless their profile says otherwise; the camera would
+# then run its old APK against the new one's manifest and close (ClassNotFoundException).
+# KernelSU Next sets that from here; official KernelSU's ksud can't, so it's done by hand.
+if [ "$KSU" = "true" ] && ! set_profile com.android.camera false; then
+    ui_print "! Set the Camera's KernelSU profile by hand, or it will close on start:"
+    ui_print "  KernelSU > Superuser > (show system apps) > Camera > turn off 'Umount modules'"
+    ui_print "  (or KernelSU > Settings > turn off 'Umount modules by default')"
+fi
+
 # Ultra HDR: what photos get, and the opt-in for HEIF.
 ui_print "- Ultra HDR: JPEG photos get an HDR gain map, except photos with a watermark"
 ui_print "  (so MIUI Gallery's editor can still change or remove it)"

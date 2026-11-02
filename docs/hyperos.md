@@ -18,6 +18,7 @@ Needs root (KernelSU or Magisk) and an LSPosed framework.
 2. Put camera 6.8.002090.2 in `Download` (where to get it: [houji-camera.md](houji-camera.md#4-getting-the-camera-apks)), or use a zip built with the APK inside (`scripts/build.sh --apk`, kept to yourself).
 3. Flash `houji-miuicamera-port-<version>.zip` in KernelSU or Magisk. On HyperOS it finds the camera wherever the ROM keeps it (`/system` or `/product`), skips the AOSP extras (icon overlay, MIUI Gallery), and installs the LSPosed module.
 4. Enable **MiuiCamera port for houji** in LSPosed for **Camera** (with Vector it's enabled for you), then reboot.
+   With official KernelSU (not KernelSU Next), also turn off **Umount modules** for the Camera: KernelSU > Superuser > show system apps > Camera. Otherwise the camera runs its old APK against the new one's manifest and closes on start (`ClassNotFoundException`, for example for `LogUploadFileProvider`). The installer says so when it can't set this itself. Magisk doesn't need it.
 5. If the camera closes with "invalid module index", clear its data once: `adb shell pm clear com.android.camera`.
 
 To go back, remove the module and reboot, then uninstall the LSPosed module.

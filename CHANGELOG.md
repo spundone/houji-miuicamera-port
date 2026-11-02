@@ -2,7 +2,7 @@
 
 ## 1.9.4
 
-- Preliminary HyperOS and xiaomi.eu support (untested): the module installs with Magisk as well as KernelSU, finds the ROM's camera in `/system` or `/product`, and on HyperOS skips the AOSP extras (icon overlay, MIUI Gallery); the LSPosed module leaves the client name, recorder output, haptics and Movie's audio to HyperOS. See docs/hyperos.md. The installer also stops if camera updates are installed on top of the system camera, since they hide the replacement, and recognises the Xiaomi 14 from any of its device or boot properties (xiaomi.eu's HyperOS 3 reports its vendor as `mivendor`).
+- Preliminary HyperOS and xiaomi.eu support (untested): the module installs with Magisk as well as KernelSU, finds the ROM's camera in `/system` or `/product`, and on HyperOS skips the AOSP extras (icon overlay, MIUI Gallery); the LSPosed module leaves the client name, recorder output, haptics and Movie's audio to HyperOS. See docs/hyperos.md. The installer also stops if camera updates are installed on top of the system camera, since they hide the replacement, and recognises the Xiaomi 14 from any of its device or boot properties (xiaomi.eu's HyperOS 3 reports its vendor as `mivendor`). With official KernelSU, which can't set app profiles from a script, it tells you to turn off the Camera's "Umount modules" by hand; without that the camera closes on start.
 
 ## 1.9.3
 
