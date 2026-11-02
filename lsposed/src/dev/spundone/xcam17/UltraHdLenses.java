@@ -63,6 +63,7 @@ final class UltraHdLenses {
         try {
             Method ultraOn = cl.loadClass(build.ultraOnClass).getDeclaredMethod(build.ultraOnMethod);
             ultraOnInMode = cl.loadClass(build.ultraOnClass).getDeclaredMethod(build.ultraOnModeMethod, int.class);
+            findCurrentMode(cl, build);
             int hooked = 0;
             for (Method m : cl.loadClass(build.zoomStateClass).getDeclaredMethods()) {
                 if (m.getName().equals(build.zoomStateMethod) && m.getParameterTypes().length == 3
@@ -168,8 +169,49 @@ final class UltraHdLenses {
         if (hooked == 0) throw new NoSuchMethodException(build.zoomApplyClass + "." + build.zoomApplyMethod);
     }
 
+    /**
+     * Ultra HD on in the current mode. The per-mode check reads Pro's 50M setting whatever the
+     * mode, which held the main camera at 1x in Pro video and Video; so the current mode, kept by
+     * every settings component (here the ratio's), must be Photo or Pro. When it can't be read,
+     * the old answer stands.
+     */
     static boolean ultraHdNow(Method ultraOn) throws Exception {
+        int mode = currentMode();
+        if (mode >= 0 && !lensMode(mode)) return false;
         return ultraHd(ultraOn, PHOTO_MODE) || ultraHd(ultraOn, PRO_MODE);
+    }
+
+    private static Method components;
+    private static Method componentOf;
+    private static Class<?> ratioComponent;
+    private static Field currentModeField;
+
+    static void findCurrentMode(ClassLoader cl, CameraBuild build) {
+        try {
+            components = cl.loadClass(build.componentsClass).getDeclaredMethod(build.componentsMethod);
+            components.setAccessible(true);
+            componentOf = components.getReturnType().getMethod("x", Class.class);
+            ratioComponent = cl.loadClass(build.ratioClass);
+            for (Class<?> k = ratioComponent; k != null && currentModeField == null; k = k.getSuperclass()) {
+                for (Field f : k.getDeclaredFields()) {
+                    if (f.getName().equals("mCurrentMode") && f.getType() == int.class) currentModeField = f;
+                }
+            }
+            if (currentModeField != null) currentModeField.setAccessible(true);
+        } catch (Throwable t) {
+            currentModeField = null;
+            Entry.log("ultra hd: current mode unreadable: " + t);
+        }
+    }
+
+    static int currentMode() {
+        if (currentModeField == null) return -1;
+        try {
+            Object c = componentOf.invoke(components.invoke(null), ratioComponent);
+            return c == null ? -1 : currentModeField.getInt(c);
+        } catch (Throwable t) {
+            return -1;
+        }
     }
 
     /**

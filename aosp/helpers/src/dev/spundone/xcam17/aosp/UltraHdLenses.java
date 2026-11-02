@@ -64,8 +64,47 @@ public final class UltraHdLenses {
         return mode == PRO_MODE && Boolean.TRUE.equals(method(n[0], n[2]).invoke(null, mode));
     }
 
+    /**
+     * Ultra HD on in the current mode. The per-mode check reads Pro's 50M setting whatever the
+     * mode, which held the main camera at 1x in Pro video and Video; so the current mode, kept
+     * by every settings component (ultra's fields 3-5: components getter class and method, and a
+     * component class), must be Photo or Pro. When it can't be read, the old answer stands.
+     */
     static boolean ultraHdNow(String ultra) throws Exception {
+        int mode = currentMode(ultra);
+        if (mode >= 0 && !lensMode(mode)) return false;
         return ultraHd(ultra, PHOTO_MODE) || ultraHd(ultra, PRO_MODE);
+    }
+
+    private static Method components;
+    private static Method componentOf;
+    private static Class<?> component;
+    private static Field currentMode;
+
+    static synchronized int currentMode(String ultra) {
+        try {
+            if (currentMode == null) {
+                String[] n = ultra.split("#");
+                if (n.length < 6) return -1;
+                ClassLoader cl = UltraHdLenses.class.getClassLoader();
+                components = Class.forName(n[3], false, cl).getDeclaredMethod(n[4]);
+                components.setAccessible(true);
+                componentOf = components.getReturnType().getMethod("x", Class.class);
+                component = Class.forName(n[5], false, cl);
+                for (Class<?> k = component; k != null && currentMode == null; k = k.getSuperclass()) {
+                    for (Field f : k.getDeclaredFields()) {
+                        if (f.getName().equals("mCurrentMode") && f.getType() == int.class) currentMode = f;
+                    }
+                }
+                if (currentMode == null) return -1;
+                currentMode.setAccessible(true);
+            }
+            Object c = componentOf.invoke(components.invoke(null), component);
+            return c == null ? -1 : currentMode.getInt(c);
+        } catch (Throwable t) {
+            Log.once("ultra hd: current mode", t);
+            return -1;
+        }
     }
 
     static boolean lensCamera(Object camera) {

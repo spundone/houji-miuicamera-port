@@ -1844,7 +1844,7 @@
        "arg2",
        "class:LH4/p0;",
        "str:a",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ]
      }
     ]
@@ -1878,7 +1878,7 @@
        "arg0",
        "class:Lcom/android/camera/data/data/i;",
        "str:S",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ]
      }
     ]
@@ -1901,7 +1901,7 @@
       "pass": [
        "result",
        "arg0",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ]
      }
     ]
@@ -1924,7 +1924,7 @@
       "pass": [
        "result",
        "this",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ]
      }
     ]
@@ -1948,7 +1948,7 @@
        "result",
        "this",
        "arg0",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ]
      }
     ]
@@ -1993,7 +1993,7 @@
       "pass": [
        "arg1",
        "arg2",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ]
      }
     ],
@@ -2004,7 +2004,7 @@
        "arg0",
        "arg1",
        "arg2",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ],
       "set": "arg0"
      }
@@ -2038,7 +2038,7 @@
       "pass": [
        "this",
        "str:b#l",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ]
      }
     ]
@@ -2061,7 +2061,7 @@
       "pass": [
        "this",
        "str:b#l",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ]
      }
     ]
@@ -2087,7 +2087,7 @@
        "arg2",
        "str:l9.h#j",
        "str:d0",
-       "str:com.android.camera.data.data.p#l0#m0"
+       "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
       ]
      }
     ],

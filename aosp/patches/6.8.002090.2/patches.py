@@ -254,7 +254,7 @@ for name, has in [("L", '"setFpsRange: "'), ("f0", '"setVideoFpsRange: "')]:
 
 # --- High: 50MP lenses, Ultra HDR, haptics ---------------------------------------------------
 
-ULTRA = "str:com.android.camera.data.data.p#l0#m0"
+ULTRA = "str:com.android.camera.data.data.p#l0#m0#g2.a#a#r2.T"
 UHD = H + "UltraHdLenses;->"
 ULTRA_CHECK = {"class": "Lcom/android/camera/data/data/p;",
                "has": [".method public static l0()Z", ".method public static m0(I)Z", ".method public static X0()V"]}
