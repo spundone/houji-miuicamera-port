@@ -91,7 +91,7 @@ name=MiuiCamera port for houji
 version=$VERSION
 versionCode=$VERSION_CODE
 author=spundone
-description=Xiaomi's camera 6.8.002090.2 (Xiaomi 18 Pro) or 6.7.000280.0 (Xiaomi 17) in place of the ROM's MiuiCamera on the Xiaomi 14. Installs its LSPosed module and an adaptive launcher icon.
+description=The Xiaomi 18 Pro camera (6.8) or Xiaomi 17 camera (6.7) on AOSP ROMs for the Xiaomi 14. Needs LSPosed; installs its LSPosed module.
 EOF
 module_zip="$DIST/houji-miuicamera-port-$VERSION.zip"
 rm -f "$module_zip"

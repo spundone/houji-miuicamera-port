@@ -75,10 +75,10 @@ if [ -n "$leica" ]; then
     name="standalone"
     kind="standalone"
 fi
-needs="No LSPosed needed"
-[ -n "$leica" ] && needs="No LSPosed, mount module or other downloads needed; Leica Essential included"
+needs="No LSPosed needed."
+[ -n "$leica" ] && needs="Includes Leica Essential. No LSPosed needed."
 sed -i '' -e "s/^name=.*/name=MiuiCamera port for houji ($name)/" \
-    -e "s/^description=.*/description=Xiaomi's camera 6.8.002090.2, patched by the AOSP kit, in place of MiuiCamera. $needs. Local build: carries Xiaomi's APK./" \
+    -e "s/^description=.*/description=The Xiaomi 18 Pro camera (6.8) on AOSP ROMs for the Xiaomi 14. $needs/" \
     "$mod/module.prop"
 zip_ksu="$DIST/houji-miuicamera-port-$VERSION-$kind.zip"
 rm -f "$zip_ksu"
@@ -88,7 +88,8 @@ echo "   $zip_ksu (contains Xiaomi's APK: do not publish)"
 if [ -n "$gallery" ]; then
     mkdir -p "$mod/gallery"
     cp "$gallery" "$mod/gallery/MIUIGallery.zip"
-    sed -i '' -e "s/^name=.*/name=MiuiCamera port for houji ($name, with MIUI Gallery)/" "$mod/module.prop"
+    sed -i '' -e "s/^name=.*/name=MiuiCamera port for houji ($name, with MIUI Gallery)/" \
+        -e "s/^description=\(.*\)/description=\1 Also installs MIUI Gallery./" "$mod/module.prop"
     zip_gallery="$DIST/houji-miuicamera-port-$VERSION-$kind-gallery.zip"
     rm -f "$zip_gallery"
     (cd "$mod" && zip -q -r -X -0 "$zip_gallery" .)
