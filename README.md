@@ -54,7 +54,7 @@ Everything below works on 6.8. Items marked (6.7 too) also work on 6.7.
 - Leica Vibrant and Authentic, filters, watermarks (6.7 too), plus Style ORIG (no Leica look) and film grain with the 18 Pro's presets
 - 50MP on the ultra-wide, main and telephoto, in Photo (4:3 or 1:1) and Pro. At 50MP the lens changes at each stop (0.6x, 1x, 3.2x)
 - 50MP RAW (DNG) in Pro on all three lenses, and 12.5MP RAW on the telephoto
-- Ultra HDR JPEG with a gain map; Ultra HDR HEIF as an opt-in (the module's Action button), since Google Photos can't back those up and macOS can't open them
+- Ultra HDR JPEG with a gain map (except photos with a watermark, so the Gallery editor can still change or remove it); Ultra HDR HEIF as an opt-in (the module's Action button), since Google Photos can't back those up and macOS can't open them
 - Telemacro (Super Macro uses the telephoto), Portrait's 1x and 2.6x buttons, 1/8000 s in Pro
 - Watermarks print "Xiaomi 14" and work with HEIF photos
 - Essential Moment: the M9 Iconic CCD, M3 B&W film and M10R Modern vintage looks, with the Leica port installed. JPEG only, 3 to 5 s per photo

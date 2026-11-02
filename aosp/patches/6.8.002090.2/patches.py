@@ -234,9 +234,9 @@ add("mutex-style", "MutexDrop (Style kept enabled)", "medium",
 
 add("watermark-subimage", "WatermarkSubimage", "medium",
     {"class": "LU8/d;", "name": "f", "proto": "(Lzi/a;ZI)Lzi/f;", "has": ['"processWatermark: start: "']},
-    {"type": "wrap", "after": [{"helper": H + "Photo;->afterWatermark(Ljava/lang/Object;Ljava/lang/Object;"
+    {"type": "wrap", "after": [{"helper": H + "Photo;->afterWatermark(Ljava/lang/Object;Ljava/lang/Object;Z"
                                           "Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
-                                "pass": ["result", "arg0", "str:s", "str:t"]}]})
+                                "pass": ["result", "arg0", "arg1", "str:s", "str:t"]}]})
 
 add("video-filter-luts", "VideoFilterLuts", "medium",
     {"class": "Lr2/a;", "name": "getItems", "proto": "()Ljava/util/List;"},

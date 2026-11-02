@@ -1655,10 +1655,11 @@
     "type": "wrap",
     "after": [
      {
-      "helper": "Ldev/spundone/xcam17/aosp/Photo;->afterWatermark(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
+      "helper": "Ldev/spundone/xcam17/aosp/Photo;->afterWatermark(Ljava/lang/Object;Ljava/lang/Object;ZLjava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
       "pass": [
        "result",
        "arg0",
+       "arg1",
        "str:s",
        "str:t"
       ]

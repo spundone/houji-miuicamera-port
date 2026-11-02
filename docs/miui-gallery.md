@@ -43,7 +43,7 @@ Scrolling one of the Gallery editor's tool bars to its end made the editor stop.
 
 - **Thumbnail:** tapping the most-recent-photo button opens `com.miui.gallery/.activity.ExternalPhotoPageActivity`. The camera also binds Gallery's service (`com.miui.gallery.permission.BIND_SERVICE`, logged as `MCAM_GalleryHelper`) and lists Gallery and the Editor among the packages it queries.
 - **Saving** doesn't need Gallery. Photos go through MediaStore and Xiaomi's background save service in the camera HAL.
-- **Watermarks:** Gallery can remove or change a watermark later using the remover data the camera writes. For frame watermarks this module drops that data (see `WatermarkSubimage`), so Gallery can't strip those afterwards. Other watermarks keep it.
+- **Watermarks:** the editor changes or removes the camera's watermark using the data the camera writes in the photo's XMP (`MiCamera:XMPMeta`, a `madrid_image` entry with the photo's size without the watermark; HyperOS writes the same). JPEG photos with a frame watermark keep it, so the editor takes the frame off instead of drawing another on top; they go without the estimated Ultra HDR gain map, since the editor ignores the entry in a gain-map photo. HEIF photos with a frame watermark still have none (`WatermarkSubimage`: the camera's HEIF path crashes building it), so the editor stacks a new watermark there.
 - **Ultra HDR:** the estimated gain map `UltraHdrJpeg` adds to JPEGs is standard Android Ultra HDR. Whether MIUI Gallery 4.3.1.15-global shows it brighter on the HDR screen hasn't been checked; Google Photos does read the format.
 
 ## Notes

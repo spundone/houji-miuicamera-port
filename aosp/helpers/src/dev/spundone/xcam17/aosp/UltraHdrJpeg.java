@@ -61,6 +61,10 @@ public final class UltraHdrJpeg {
             if (in == null) return;
             photo = readAll(in);
         }
+        if (hasWatermarkRemoverData(photo)) {
+            Log.once("ultra hdr: " + uri + ": has watermark data for the Gallery editor, left without a gain map");
+            return;
+        }
         byte[] out;
         if (isPlainJpeg(photo)) {
             out = withGainMap(photo);
@@ -77,6 +81,25 @@ public final class UltraHdrJpeg {
             if (os == null) return;
             os.write(out);
         }
+    }
+
+    static final byte[] MADRID = "madrid_image".getBytes(StandardCharsets.ISO_8859_1);
+
+    /**
+     * The photo carries the camera's watermark data for the Gallery editor (MiCamera XMP
+     * "madrid_image": the photo's size without the watermark). MIUI Gallery's editor ignores it
+     * in a gain-map photo and draws a new watermark over the old one, so such photos keep it
+     * and go without the estimated gain map; HyperOS writes no gain map on the Xiaomi 14 either.
+     */
+    static boolean hasWatermarkRemoverData(byte[] photo) {
+        outer:
+        for (int i = 0; i + MADRID.length <= photo.length; i++) {
+            for (int j = 0; j < MADRID.length; j++) {
+                if (photo[i + j] != MADRID[j]) continue outer;
+            }
+            return true;
+        }
+        return false;
     }
 
     /** Android's own decoder finds the gain map (Bitmap.hasGainmap, API 34). */

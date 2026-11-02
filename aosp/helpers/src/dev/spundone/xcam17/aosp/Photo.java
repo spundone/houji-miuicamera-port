@@ -40,11 +40,14 @@ public final class Photo {
 
     /**
      * Watermark drawing: a frame watermark covers nothing, so there is no sub-image, but the
-     * remover info is still set and the HEIF saver crashed building it. Without a sub-image the
-     * remover info is dropped.
+     * remover info is still set and the HEIF saver crashed building it. For HEIF (jpeg false)
+     * the remover info is dropped without a sub-image. JPEG keeps it: its saver writes the
+     * Gallery's "madrid_image" entry (the photo's size without the frame), which the editor
+     * needs to take the frame off instead of drawing another on top.
      */
-    public static Object afterWatermark(Object drawn, Object job, String removerField, String subimageField) {
-        if (job == null) return drawn;
+    public static Object afterWatermark(Object drawn, Object job, boolean jpeg, String removerField,
+            String subimageField) {
+        if (job == null || jpeg) return drawn;
         try {
             Field remover = job.getClass().getDeclaredField(removerField);
             Field subimage = job.getClass().getDeclaredField(subimageField);

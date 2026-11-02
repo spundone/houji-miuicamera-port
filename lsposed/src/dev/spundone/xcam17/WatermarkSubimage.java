@@ -12,9 +12,11 @@ import de.robv.android.xposed.XposedBridge;
  * Gallery can restore it. Frame watermarks (a band below the photo, such as the Leica ones)
  * cover nothing, so there is no sub-image, yet the remover info is still set, and the HEIF
  * path then wraps the missing sub-image and builds its metadata from nothing: the saver thread
- * crashes and the photo is lost. The JPEG path ends up without remover info in this case
- * anyway, so the remover info is dropped whenever there is no sub-image, and HEIF takes its
- * working "no remover info" path. Watermarks that cover part of the photo are unchanged.
+ * crashes and the photo is lost. For HEIF the remover info is dropped when there is no
+ * sub-image, so HEIF takes its working "no remover info" path. JPEG keeps it: its saver handles
+ * the missing sub-image and writes the Gallery's "madrid_image" entry (the photo's size without
+ * the frame, as HyperOS does), which the editor needs to take the frame off instead of drawing
+ * another on top. The draw method's second argument is false for HEIF.
  */
 final class WatermarkSubimage {
     private WatermarkSubimage() {}
@@ -54,7 +56,8 @@ final class WatermarkSubimage {
         @Override
         protected void afterHookedMethod(MethodHookParam p) throws Throwable {
             Object job = p.args[0];
-            if (job != null && subimage.get(job) == null) remover.set(job, null);
+            boolean jpeg = p.args.length > 1 && Boolean.TRUE.equals(p.args[1]);
+            if (job != null && !jpeg && subimage.get(job) == null) remover.set(job, null);
         }
     }
 }
