@@ -88,6 +88,7 @@ Everything below works on 6.8. Items marked (6.7 too) also work on 6.7.
 - **Front camera while recording** isn't offered at 4K60 or with Dolby Vision at 4K, as on Xiaomi's phones.
 - **4K60 lens switching isn't advertised by the HAL.** It worked in testing (files stay 3840x2160 at about 58 fps), but long clips may run hot.
 - **Essential Moment's notices are in Chinese** in the KernelSU-only and ROM builds; the LSPosed build translates them. The port's AI style model needs the Snapdragon 8 Elite Gen 5, so its fallback tone is used.
+- **Filter adjustments show only in the viewfinder.** The sliders on a filter (Saturation, Tone, Soft light, Cold/Warm, Cyan/Magenta, Noise) aren't in the saved photo, on either camera. The Xiaomi 14's photo filter library renders the filters themselves but not these adjustments.
 - **HDR and Dolby Vision are separate.** Dolby Vision records 10-bit HLG; the HDR tile merges exposures but records 8-bit SDR unless Dolby Vision is on too.
 - **The CN build's China-only extras stay on.** Only the consent check is redirected. The camera shows Xiaomi's terms on first launch.
 - **Switching camera builds** can close the camera with "invalid module index". Clear its data once (`pm clear com.android.camera`).
