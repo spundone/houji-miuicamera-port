@@ -1,4 +1,4 @@
-# KernelSU module installer, sourced by ksud with MODPATH, ZIPFILE, ui_print and abort set.
+# KernelSU / Magisk module installer, sourced with MODPATH, ZIPFILE, ui_print and abort set.
 # shellcheck shell=sh disable=SC2034,SC2154
 SKIPUNZIP=0
 
@@ -8,9 +8,31 @@ ui_print "- MiuiCamera port for the Xiaomi 14 (houji)"
 
 device=$(getprop ro.product.vendor.device)
 [ "$device" = "houji" ] || abort "! This module is for the Xiaomi 14 (houji); this phone is '$device'"
-[ "$KSU" = "true" ] || abort "! KernelSU is required (the installer sets KernelSU app profiles)"
+[ "$KSU" = "true" ] || [ -n "$MAGISK_VER_CODE" ] || abort "! KernelSU or Magisk is required"
 [ "$(getprop ro.build.version.sdk)" -ge 35 ] || abort "! Android 15 or newer is required"
-[ -f /system/priv-app/MiuiCamera/MiuiCamera.apk ] || abort "! This ROM has no /system/priv-app/MiuiCamera to replace"
+
+# HyperOS (Xiaomi's firmware, or xiaomi.eu) has its own camera stack: only the camera APK is
+# swapped, and the LSPosed module skips its AOSP-only fixes there.
+hyperos=$(getprop ro.mi.os.version.name)
+if [ -n "$hyperos" ]; then
+    ui_print "- HyperOS $hyperos (preliminary support)"
+    [ -f "$MODPATH/kit" ] && abort "! This zip is for AOSP ROMs; on HyperOS use the module zip with the LSPosed module"
+fi
+
+# The ROM's camera: AOSP houji ROMs keep it in /system, HyperOS may keep it in /product.
+target=""
+for t in /system/priv-app/MiuiCamera/MiuiCamera.apk /product/priv-app/MiuiCamera/MiuiCamera.apk \
+    /system_ext/priv-app/MiuiCamera/MiuiCamera.apk /product/app/MiuiCamera/MiuiCamera.apk; do
+    [ -f "$t" ] && target="$t" && break
+done
+[ -n "$target" ] || abort "! This ROM has no MiuiCamera to replace"
+echo "$target" > "$MODPATH/target"
+ui_print "- Replacing $target"
+# A camera update installed on top (from the app store, or adb install) hides the system APK.
+case "$(pm path com.android.camera 2>/dev/null)" in
+    *package:/data/*)
+        abort "! Uninstall the camera's updates first (Settings > Apps > Camera > Uninstall updates)" ;;
+esac
 
 # The camera APK is Xiaomi's and is not redistributed. A zip built with --apk carries it;
 # otherwise take it from the phone's Download folder.
@@ -56,6 +78,7 @@ fi
 
 # The MIUI Gallery Global module, when a zip carries it: staged like a KernelSU module update.
 gallery_zip="$MODPATH/gallery/MIUIGallery.zip"
+[ -n "$hyperos" ] && rm -rf "$MODPATH/gallery"
 if [ -f "$gallery_zip" ]; then
     staged=/data/adb/modules_update/MIUIGallery
     rm -rf "$staged" && mkdir -p "$staged"
@@ -120,6 +143,9 @@ elif [ -f "$old_kit/classes11.dex" ]; then
     mkdir -p "${kit%/*}" && cp -a "$old_kit" "${kit%/*}/" && ui_print "- Leica Essential looks kept from the installed version"
 fi
 
+# HyperOS's launcher draws the camera's icon itself: no icon overlay there.
+[ -n "$hyperos" ] && rm -rf "$MODPATH/system/product/overlay" "$MODPATH/overlay"
+
 # The camera APK is bind-mounted by post-fs-data.sh; system/ holds the icon overlay
 # (product/overlay) and the Leica files, mounted by the module manager. Older versions set skip_mount.
 rm -f "$MODPATH/skip_mount"
@@ -131,14 +157,16 @@ done
 
 # The launcher reads the camera's label and icon from the camera's files, so it must see the
 # module's files too. Remember the current home app for post-fs-data.sh and uninstall.sh.
-home=$(cmd package resolve-activity --brief -c android.intent.category.HOME -a android.intent.action.MAIN 2>/dev/null \
-    | tail -1 | cut -d/ -f1)
-case "$home" in
-    *.*) echo "$home" > "$MODPATH/launcher" && ui_print "- Launcher: $home" ;;
-esac
-# The launcher caches icons by package and keeps the one it drew before the overlay was
-# mounted; service.sh drops that cache once, after the next boot's first unlock.
-touch "$MODPATH/reset_icon_cache"
+if [ -z "$hyperos" ]; then
+    home=$(cmd package resolve-activity --brief -c android.intent.category.HOME -a android.intent.action.MAIN 2>/dev/null \
+        | tail -1 | cut -d/ -f1)
+    case "$home" in
+        *.*) echo "$home" > "$MODPATH/launcher" && ui_print "- Launcher: $home" ;;
+    esac
+    # The launcher caches icons by package and keeps the one it drew before the overlay was
+    # mounted; service.sh drops that cache once, after the next boot's first unlock.
+    touch "$MODPATH/reset_icon_cache"
+fi
 
 # All in one: install the LSPosed module carried in the zip, and enable it if Vector is the
 # LSPosed framework. pm reads the APK as system, so it goes through /data/local/tmp.

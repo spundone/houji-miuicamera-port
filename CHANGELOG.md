@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Preliminary HyperOS and xiaomi.eu support (untested): the module installs with Magisk as well as KernelSU, finds the ROM's camera in `/system` or `/product`, and on HyperOS skips the AOSP extras (icon overlay, MIUI Gallery); the LSPosed module leaves the client name, recorder output, haptics and Movie's audio to HyperOS. See docs/hyperos.md. The installer also stops if camera updates are installed on top of the system camera, since they hide the replacement.
+
 ## 1.9.3
 
 - MIUI Gallery's editor can change or remove the camera's frame watermark on JPEG photos instead of drawing another on top. The module dropped the camera's watermark data for every frame watermark (only HEIF needs that); JPEG photos now keep it, in the same form HyperOS writes. Those photos go without the estimated Ultra HDR gain map, since the editor ignores the data in a gain-map photo. HEIF photos with a frame watermark still stack.

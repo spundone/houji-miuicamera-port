@@ -29,7 +29,7 @@ known_apk() {
 
 clear_camera_package_cache() {
     rm -f /data/system/package_cache/*/MiuiCamera-* 2>/dev/null
-    rm -f /data/dalvik-cache/*/system@priv-app@MiuiCamera@* 2>/dev/null
+    rm -f /data/dalvik-cache/*/*@MiuiCamera@* 2>/dev/null
 }
 
 # set_profile <package> <umount_modules true|false>

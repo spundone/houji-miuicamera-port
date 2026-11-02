@@ -19,14 +19,14 @@ With 6.8 you get the newer interface, Leica styles and filters, film grain, 50MP
 | --- | --- | --- |
 | A rooted user | The KernelSU module from [Releases](https://github.com/spundone/houji-miuicamera-port/releases), which installs an LSPosed module | KernelSU (or KernelSU Next) and an LSPosed framework (Vector or LSPosed); the camera APK in `Download` |
 | A rooted user without LSPosed | A KernelSU-only zip you build yourself ([Build](#build)) | KernelSU only. The zip carries the patched camera, so it is never published |
-| On HyperOS (preliminary, untested) | The camera APK installed as an update, plus the LSPosed module ([docs/hyperos.md](docs/hyperos.md)) | Root and an LSPosed framework; no KernelSU module |
+| On HyperOS or xiaomi.eu (preliminary, untested) | The same module zip, or the camera APK installed as an update, plus the LSPosed module ([docs/hyperos.md](docs/hyperos.md)) | KernelSU or Magisk, and an LSPosed framework |
 | A ROM maintainer | [android_device_xiaomi_houji-miuicamera-port](https://github.com/spundone/android_device_xiaomi_houji-miuicamera-port), a device tree with the patched APK and Leica Essential | A houji tree that includes the 6.4 houji-miuicamera trees |
 
 All three apply the same fixes. The KernelSU module hooks the camera at runtime with LSPosed; the other two use a copy of the camera patched ahead of time by [`aosp/`](aosp/README.md).
 
 ## Install (KernelSU module)
 
-1. Root with KernelSU and install an LSPosed framework.
+1. Root with KernelSU (or Magisk) and install an LSPosed framework.
 2. Copy the camera APK to the phone's `Download` folder. [Getting the camera APKs](docs/houji-camera.md#4-getting-the-camera-apks) lists where to find them and their SHA-256.
 3. Optional, for Essential Moment's Leica looks: also copy the community Leica port of camera 6.8 (`com.kobbin.leica` 6.8.001960.0, SHA-256 `b2bf1186e6c0004621e19d914feb1d0e8106e2d976edc0634e01c30d6bc90082`). The installer copies what it needs from it; the port app itself isn't installed.
 4. Install `houji-miuicamera-port-<version>.zip` in the KernelSU manager. It checks the phone and the APK, then installs the LSPosed module it carries. With Vector it also enables it for the camera; with other LSPosed builds, enable **MiuiCamera port for houji** yourself (its scope is preset).

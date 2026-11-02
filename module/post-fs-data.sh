@@ -3,7 +3,9 @@
 MODDIR=${0%/*}
 . "$MODDIR/common.sh"
 
+# The ROM's camera, found by the installer (HyperOS may keep it in /product).
 TARGET=/system/priv-app/MiuiCamera/MiuiCamera.apk
+[ -f "$MODDIR/target" ] && TARGET=$(cat "$MODDIR/target")
 
 # Standalone zips carry the Leica files next to the APK in app/, mounted as the whole app
 # folder so no module manager mount is needed.
