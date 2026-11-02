@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.9.3
 
 - MIUI Gallery's editor can change or remove the camera's frame watermark on JPEG photos instead of drawing another on top. The module dropped the camera's watermark data for every frame watermark (only HEIF needs that); JPEG photos now keep it, in the same form HyperOS writes. Those photos go without the estimated Ultra HDR gain map, since the editor ignores the data in a gain-map photo. HEIF photos with a frame watermark still stack.
+- The installer says which photos get Ultra HDR and whether HEIC Ultra HDR is on; the Action button mentions the watermark exception.
 
 ## 1.9.2
 

@@ -154,13 +154,22 @@ if [ -f "$MODPATH/xcam17-lsposed.apk" ]; then
             ui_print "- LSPosed module enabled in Vector for the camera"
         fi
     else
-        ui_print "! Could not install the LSPosed module; install xcam17-lsposed APK by hand"
+        ui_print "! Could not install the LSPosed module; install the houji-miuicamera-port-lsposed APK by hand"
     fi
     rm -f "$tmp" "$MODPATH/xcam17-lsposed.apk"
 fi
 
 # Android caches parsed packages by path; drop the cached 6.4 so the new APK is read.
 clear_camera_package_cache
+
+# Ultra HDR: what photos get, and the opt-in for HEIF.
+ui_print "- Ultra HDR: JPEG photos get an HDR gain map, except photos with a watermark"
+ui_print "  (so MIUI Gallery's editor can still change or remove it)"
+if [ -f "$MODPATH/heic_ultrahdr" ]; then
+    ui_print "- HEIC Ultra HDR is on (Action button turns it off)"
+else
+    ui_print "- HEIC Ultra HDR is off; the Action button turns it on"
+fi
 
 if [ -n "$lsposed_enabled" ] || [ -f "$MODPATH/kit" ]; then
     ui_print "- Done. Reboot"
