@@ -129,17 +129,26 @@ if [ -d "$MODPATH/leica" ]; then
     ui_print "- Leica Essential looks from the zip"
     old_kit=/nonexistent
 else
+    # The classic port before the Leica Moment build (com.kobbin.leica.compat17u), whose own
+    # looks need the kit's picker.
     for f in /sdcard/Download/*.apk; do
         [ -f "$f" ] || continue
         unzip -l "$f" assets/legend18/provenance.json 2>/dev/null | grep -q provenance.json || continue
-        unzip -p "$f" classes11.dex 2>/dev/null | grep -q LegendaryPostProcessor && leica_apk="$f" && break
+        unzip -p "$f" classes11.dex 2>/dev/null | grep -q LegendaryPostProcessor || continue
+        if unzip -l "$f" classes15.dex 2>/dev/null | grep -q classes15.dex; then
+            [ -n "$leica_apk" ] || leica_apk="$f"
+        else
+            leica_apk="$f"
+            break
+        fi
     done
 fi
 if [ -n "$leica_apk" ]; then
     ui_print "- Leica Essential looks from $(basename "$leica_apk")"
     mkdir -p "$kit/lib"
-    unzip -o -q "$leica_apk" classes11.dex classes12.dex 'assets/legend18/*' 'assets/leica-v4/*' \
-        'assets/leica-v43-ui/*' 'assets/leica_filter_param_*' -d "$kit"
+    files='^classes1[1-9]\.dex$|^assets/(legend18|leica-v4|leica-v43-ui|lm-ui)/|^assets/(leica_filter_param_|lm_)|^assets/(scene-transfer\.bin|leica-color-v3\.rgb)$'
+    # shellcheck disable=SC2046
+    unzip -o -q "$leica_apk" $(unzip -l "$leica_apk" | awk '{print $4}' | grep -E "$files") -d "$kit"
     # The port's own native libraries: those the camera APK doesn't have, and the C++ runtime
     # its helper programs load from the same folder.
     have=$(unzip -l "$MODPATH/MiuiCamera.apk" 'lib/arm64-v8a/*' | awk '{print $4}')

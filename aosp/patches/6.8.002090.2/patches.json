@@ -2434,6 +2434,59 @@
    }
   },
   {
+   "id": "leica-looks",
+   "hook": "LeicaLooks (the Leica Moment build's looks in Leica Essential's look picker)",
+   "effort": "medium",
+   "find": {
+    "class": "Lc6/c;",
+    "name": "initView",
+    "proto": "(Landroid/view/View;)V"
+   },
+   "action": {
+    "type": "wrap",
+    "after": [
+     {
+      "helper": "Ldev/spundone/xcam17/aosp/LeicaLooks;->open(Ljava/lang/Object;Landroid/view/View;Ljava/lang/String;)V",
+      "pass": [
+       "this",
+       "arg0",
+       "str:a#ms#ns"
+      ]
+     }
+    ]
+   },
+   "check": [
+    {
+     "class": "Lc6/c;",
+     "has": [
+      "\"FragmentLegendarySelected\"",
+      ".field public a:Lr2/B;",
+      ".method public static ms(Lc6/c;Lcom/android/camera/data/data/d;)V",
+      ".method public final ns()V"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "leica-looks-pause",
+   "hook": "LeicaLooks (the picker closes with the look list)",
+   "effort": "medium",
+   "find": {
+    "class": "Lc6/c;",
+    "name": "onPause",
+    "proto": "()V"
+   },
+   "action": {
+    "type": "wrap",
+    "before": [
+     {
+      "helper": "Ldev/spundone/xcam17/aosp/LeicaLooks;->close()V",
+      "pass": []
+     }
+    ]
+   }
+  },
+  {
    "id": "ultra-hdr",
    "hook": "UltraHdrJpeg + HeifGainMap (from 1b4f7b6)",
    "effort": "high",

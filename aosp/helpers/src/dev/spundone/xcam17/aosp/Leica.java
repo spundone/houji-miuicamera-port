@@ -44,6 +44,8 @@ public final class Leica {
     static final String ASSETS = KIT + "/assets";
     static final String[] DEX = {KIT + "/classes11.dex", KIT + "/classes12.dex"};
     static final String PROCESSOR = "com.codex.leicaapp.LegendaryPostProcessor";
+    /** The Leica Moment build's second engine and its looks (classes15). */
+    static final String MOMENT = "com.codex.lmport.MomentBridge";
     static final int MODULE = 256;
 
     /** Look and preview result per Legendary photo task, from the shutter until it is saved. */
@@ -51,8 +53,12 @@ public final class Leica {
 
     private static Camera camera;
     private static boolean cameraFailed;
+    private static ClassLoader kit;
+    private static boolean kitFailed;
     private static Method process;
     private static boolean processorFailed;
+    private static Class<?> moment;
+    private static boolean momentChecked;
 
     private Leica() {}
 
@@ -193,13 +199,9 @@ public final class Leica {
     private static synchronized Method processor() {
         if (process != null || processorFailed) return process;
         try {
-            Context app = (Context) Class.forName("android.app.ActivityThread")
-                    .getMethod("currentApplication").invoke(null);
-            app.getApplicationInfo().nativeLibraryDir = LIB;
-            addAssets(app);
-            ClassLoader kit = new DexClassLoader(String.join(File.pathSeparator, DEX), null, LIB,
-                    Leica.class.getClassLoader());
-            process = kit.loadClass(PROCESSOR).getMethod("process", byte[].class, Object.class);
+            ClassLoader cl = kit();
+            if (cl == null) throw new IllegalStateException("port's code not loaded");
+            process = cl.loadClass(PROCESSOR).getMethod("process", byte[].class, Object.class);
         } catch (Throwable t) {
             processorFailed = true;
             Log.once("leica: processor not loaded", t);
@@ -207,18 +209,74 @@ public final class Leica {
         return process;
     }
 
+    /** The port's code (every classes*.dex in the kit folder), its libraries and its models. */
+    static synchronized ClassLoader kit() {
+        if (kit != null || kitFailed) return kit;
+        try {
+            Context app = app();
+            app.getApplicationInfo().nativeLibraryDir = LIB;
+            addAssets(app);
+            kit = new DexClassLoader(String.join(File.pathSeparator, dex()), null, LIB, Leica.class.getClassLoader());
+        } catch (Throwable t) {
+            kitFailed = true;
+            Log.once("leica: port's code not loaded", t);
+        }
+        return kit;
+    }
+
+    static String[] dex() {
+        String[] names = new File(KIT).list((d, n) -> n.startsWith("classes") && n.endsWith(".dex"));
+        if (names == null || names.length == 0) return DEX;
+        Arrays.sort(names);
+        String[] out = new String[names.length];
+        for (int i = 0; i < names.length; i++) out[i] = KIT + "/" + names[i];
+        return out;
+    }
+
+    /** The Leica Moment engine, when the kit holds that build's files; else null. */
+    static synchronized Class<?> moment() {
+        if (momentChecked) return moment;
+        momentChecked = true;
+        if (!installed() || !new File(KIT, "classes15.dex").isFile()) return null;
+        try {
+            ClassLoader cl = kit();
+            if (cl != null) moment = cl.loadClass(MOMENT);
+            Log.once("leica: Leica Moment looks on");
+            for (String a : new String[] {"legend18/provenance.json", "lm_lut_alexa.bin", "lm-ui/tone-atlas.png"}) {
+                try (java.io.InputStream in = app().getAssets().open(a)) {
+                    Log.once("leica: asset " + a + " ok, " + in.available());
+                } catch (Throwable t) {
+                    android.util.Log.w("xcam17", "leica: asset " + a, t);
+                }
+            }
+        } catch (Throwable t) {
+            Log.once("leica: Leica Moment engine not loaded", t);
+        }
+        return moment;
+    }
+
+    static Context app() throws Exception {
+        return (Context) Class.forName("android.app.ActivityThread").getMethod("currentApplication").invoke(null);
+    }
+
     /** The port reads its models as app assets; the kit folder is laid out like an APK. */
     static void addAssets(Context app) throws Exception {
         ResourcesProvider provider;
         try {
             provider = ResourcesProvider.loadFromDirectory(KIT, null);
+            Log.once("leica: kit folder as resources");
         } catch (Throwable t) {
             Log.once("leica: kit folder as resources", t);
             provider = ResourcesProvider.empty(new KitAssets());
         }
         ResourcesLoader loader = new ResourcesLoader();
         loader.addProvider(provider);
+        // The camera's Application has its own Resources; getAssets() reads the base context's.
         app.getResources().addLoaders(loader);
+        if (app instanceof android.content.ContextWrapper) {
+            android.content.res.Resources base = ((android.content.ContextWrapper) app).getBaseContext().getResources();
+            if (base != app.getResources()) base.addLoaders(loader);
+        }
     }
 
     static final class KitAssets implements AssetsProvider {

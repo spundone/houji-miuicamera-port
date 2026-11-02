@@ -39,7 +39,8 @@ final class LeicaLegendary {
     static final String ASSETS = KIT + "/assets";
     static final String[] DEX = {KIT + "/classes11.dex", KIT + "/classes12.dex"};
     static final String PROCESSOR = "com.codex.leicaapp.LegendaryPostProcessor";
-    static final String[] ASSET_PREFIXES = {"legend18", "leica-v4", "leica-v43-ui", "leica_filter_param_"};
+    static final String[] ASSET_PREFIXES = {"legend18", "leica-v4", "leica-v43-ui", "leica_filter_param_",
+            "lm_", "lm-ui", "scene-transfer.bin", "leica-color-v3.rgb"};
     static final int MODULE = 256;
 
     static final DeviceFeatures.Flag[] FLAGS = {
@@ -236,7 +237,7 @@ final class LeicaLegendary {
                 Context app = (Context) Class.forName("android.app.ActivityThread")
                         .getMethod("currentApplication").invoke(null);
                 app.getApplicationInfo().nativeLibraryDir = LIB;
-                ClassLoader kit = new KitLoader(String.join(File.pathSeparator, DEX), LIB, camera);
+                ClassLoader kit = new KitLoader(String.join(File.pathSeparator, dex()), LIB, camera);
                 Class<?> processor = kit.loadClass(PROCESSOR);
                 process = processor.getMethod("process", byte[].class, Object.class);
                 hookNotices(processor, kit);
@@ -246,6 +247,16 @@ final class LeicaLegendary {
             }
             return process;
         }
+    }
+
+    /** Every classes*.dex in the kit: the Leica Moment build's engine is in classes13-15. */
+    static String[] dex() {
+        String[] names = new File(KIT).list((d, n) -> n.startsWith("classes") && n.endsWith(".dex"));
+        if (names == null || names.length == 0) return DEX;
+        java.util.Arrays.sort(names);
+        String[] out = new String[names.length];
+        for (int i = 0; i < names.length; i++) out[i] = KIT + "/" + names[i];
+        return out;
     }
 
     /**

@@ -37,9 +37,12 @@ echo "$out: device tree with $(ls "$out"/prebuilt/MiuiCamera.apk.part-* | wc -l 
 unzip -q -l "$leica" assets/legend18/provenance.json >/dev/null \
     || { echo "$leica is not the Leica port (no assets/legend18)" >&2; exit 1; }
 dir="$out/leica"
-mkdir -p "$dir/lib"
-unzip -o -q "$leica" classes11.dex classes12.dex 'assets/legend18/*' 'assets/leica-v4/*' \
-    'assets/leica-v43-ui/*' 'assets/leica_filter_param_*' -d "$dir"
+rm -rf "$dir" && mkdir -p "$dir/lib"
+# The Leica port's code and models; the Leica Moment build adds a second engine in classes13-15
+# with its lm_ models. Its AI composition models aren't used.
+files='^classes1[1-9]\.dex$|^assets/(legend18|leica-v4|leica-v43-ui|lm-ui)/|^assets/(leica_filter_param_|lm_)|^assets/(scene-transfer\.bin|leica-color-v3\.rgb)$'
+# shellcheck disable=SC2046
+unzip -o -q "$leica" $(unzip -Z1 "$leica" | grep -E "$files") -d "$dir"
 # The port's own native libraries: those the camera APK doesn't have, and the C++ runtime its
 # helper programs load from the same folder.
 have=$(unzip -Z1 "$apk" 'lib/arm64-v8a/*')
@@ -63,8 +66,10 @@ done
     echo "LEICA_PATH := \$(MIUICAMERA_PORT_PATH)/leica"
     echo
     echo "PRODUCT_COPY_FILES += \\"
-    echo "    \$(LEICA_PATH)/classes11.dex:\$(TARGET_COPY_OUT_SYSTEM)/etc/xcam17/leica/classes11.dex \\"
-    echo "    \$(LEICA_PATH)/classes12.dex:\$(TARGET_COPY_OUT_SYSTEM)/etc/xcam17/leica/classes12.dex \\"
+    for f in "$dir"/classes*.dex; do
+        n=${f##*/}
+        echo "    \$(LEICA_PATH)/$n:\$(TARGET_COPY_OUT_SYSTEM)/etc/xcam17/leica/$n \\"
+    done
     echo "    \$(call find-copy-subdir-files,*,\$(LEICA_PATH)/assets,\$(TARGET_COPY_OUT_SYSTEM)/etc/xcam17/leica/assets)"
     echo
     echo "PRODUCT_PACKAGES += \\"

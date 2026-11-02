@@ -378,6 +378,17 @@ add("leica-snapshot", "LeicaLegendary (look and preview result at the shutter)",
 add("leica-render", "LeicaLegendary (the port renders the look as the photo is saved)", "high",
     {"class": "Lt7/d;", "name": "a", "proto": "(LSh/t;)V"},
     {"type": "wrap", "before": [{"helper": LEICA + "render(Ljava/lang/Object;)V", "pass": ["arg0"]}]})
+LOOKS = H + "LeicaLooks;->"
+add("leica-looks", "LeicaLooks (the Leica Moment build's looks in Leica Essential's look picker)", "medium",
+    {"class": "Lc6/c;", "name": "initView", "proto": "(Landroid/view/View;)V"},
+    {"type": "wrap", "after": [{"helper": LOOKS + "open(Ljava/lang/Object;Landroid/view/View;Ljava/lang/String;)V",
+                                "pass": ["this", "arg0", "str:a#ms#ns"]}]},
+    [{"class": "Lc6/c;", "has": ['"FragmentLegendarySelected"', ".field public a:Lr2/B;",
+                                 ".method public static ms(Lc6/c;Lcom/android/camera/data/data/d;)V",
+                                 ".method public final ns()V"]}])
+add("leica-looks-pause", "LeicaLooks (the picker closes with the look list)", "medium",
+    {"class": "Lc6/c;", "name": "onPause", "proto": "()V"},
+    {"type": "wrap", "before": [{"helper": LOOKS + "close()V", "pass": []}]})
 
 add("ultra-hdr", "UltraHdrJpeg + HeifGainMap (from 1b4f7b6)", "high",
     {"class": "Ll7/k;", "name": "w", "proto": "(Landroid/net/Uri;ZLjava/lang/String;IZ)V"},

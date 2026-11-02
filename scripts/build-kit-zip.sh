@@ -17,6 +17,9 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 VERSION=$(tr -d '[:space:]' < "$ROOT/VERSION")
 OUT="$ROOT/build"
 DIST="$ROOT/dist"
+# The Leica port's code and models; the Leica Moment build (com.kobbin.leica.compat17u) adds a
+# second engine in classes13-15 with its lm_ models. Its AI composition models aren't used.
+LEICA_FILES='^classes1[1-9]\.dex$|^assets/(legend18|leica-v4|leica-v43-ui|lm-ui)/|^assets/(leica_filter_param_|lm_)|^assets/(scene-transfer\.bin|leica-color-v3\.rgb)$'
 patched="" leica="" gallery=""
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -60,8 +63,8 @@ if [ -n "$leica" ]; then
     unzip -q -l "$leica" assets/legend18/provenance.json >/dev/null \
         || { echo "$leica is not the Leica port (no assets/legend18)" >&2; exit 1; }
     mkdir -p "$mod/leica/lib"
-    unzip -o -q "$leica" classes11.dex classes12.dex 'assets/legend18/*' 'assets/leica-v4/*' \
-        'assets/leica-v43-ui/*' 'assets/leica_filter_param_*' -d "$mod/leica"
+    # shellcheck disable=SC2046
+    unzip -o -q "$leica" $(unzip -Z1 "$leica" | grep -E "$LEICA_FILES") -d "$mod/leica"
     # The port's own native libraries: those the camera APK doesn't have, and the C++ runtime
     # its helper programs load from the same folder.
     have=$(unzip -Z1 "$camera" 'lib/arm64-v8a/*')
@@ -74,6 +77,10 @@ if [ -n "$leica" ]; then
     echo "   $(du -sh "$mod/leica" | cut -f1)"
     name="standalone"
     kind="standalone"
+    if [ -f "$mod/leica/classes15.dex" ] && grep -qa 'lmport/MomentBridge' "$mod/leica/classes15.dex"; then
+        name="standalone, Leica Moment looks"
+        kind="standalone-moment"
+    fi
 fi
 needs="No LSPosed needed."
 [ -n "$leica" ] && needs="Includes Leica Essential. No LSPosed needed."
