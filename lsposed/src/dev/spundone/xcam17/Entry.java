@@ -14,7 +14,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 /**
  * Runtime patches that let Xiaomi's newer camera (MiuiCamera 6.7 from the Xiaomi 17, or
- * 6.8 from the Xiaomi 18 Pro, CN builds) run on an AOSP ROM for the Xiaomi 14 (houji).
+ * 6.8 from the Xiaomi 18 Pro, CN builds) run on an AOSP ROM for the Xiaomi 14 (houji), or on
+ * HyperOS (preliminary), where the fixes for what AOSP lacks are skipped.
  *
  * The camera is obfuscated, so every hook first checks that the class and method it
  * targets still have the shape it was written against. On any other camera build the
@@ -27,11 +28,16 @@ public class Entry implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) {
         if (!CAMERA.equals(lp.packageName) || !lp.isFirstApplication) return;
+        boolean hyperOs = isHyperOs();
+        log(hyperOs ? "HyperOS: its own client name, recorder, haptics and audio are used"
+                : "AOSP ROM");
         // These don't depend on the camera's obfuscated names.
-        hookClientName(lp.classLoader);
-        AnnexBVideo.hook();
+        if (!hyperOs) {
+            hookClientName(lp.classLoader);
+            AnnexBVideo.hook();
+            AudioParaStub.hook(lp.classLoader);
+        }
         SaliencyOff.hook(lp.classLoader);
-        AudioParaStub.hook(lp.classLoader);
         Dng50.hook();
 
         CameraBuild build = CameraBuild.detect(lp.classLoader);
@@ -55,13 +61,34 @@ public class Entry implements IXposedHookLoadPackage {
         LeicaLegendary.hook(lp.classLoader, build);
         VideoFilterLuts.hook(lp.classLoader, build);
         OpenGate.hook(lp.classLoader, build);
-        CameraHaptics.hook(lp.classLoader, build);
+        if (!hyperOs) CameraHaptics.hook(lp.classLoader, build);
         hookStreetMode(lp.classLoader);
         StreetFocus.hook(lp.classLoader, build);
         ProfileTables.hook(lp.classLoader, build);
         VideoCaps.hook(lp.classLoader, build);
         TeleFallback.hook(lp.classLoader, build);
         if (build.qualityCheckClass != null) ShortVideo.hook(lp.classLoader);
+    }
+
+    /**
+     * HyperOS (Xiaomi's own firmware) rather than an AOSP ROM. AOSP houji ROMs set the old
+     * ro.miui.* properties for their camera port, but not HyperOS's ro.mi.os.*, and they have
+     * none of its framework classes.
+     */
+    static boolean isHyperOs() {
+        try {
+            Object name = Class.forName("android.os.SystemProperties").getMethod("get", String.class)
+                    .invoke(null, "ro.mi.os.version.name");
+            if (name instanceof String && !((String) name).isEmpty()) return true;
+        } catch (Throwable ignored) {
+            // Fall through to the class check.
+        }
+        try {
+            Class.forName("miui.os.Build", false, null);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     /**

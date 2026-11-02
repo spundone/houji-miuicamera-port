@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MiuiCamera port for houji</string>
-    <string name="description">Makes Xiaomi\'s camera 6.8 or 6.7 work on AOSP ROMs for the Xiaomi 14: consent, profile, recording, 50MP lenses and more.</string>
+    <string name="description">Makes Xiaomi\'s camera 6.8 or 6.7 work on the Xiaomi 14, on AOSP ROMs or HyperOS (preliminary): profile, recording, 50MP lenses and more.</string>
     <string-array name="scope">
         <item>com.android.camera</item>
     </string-array>
