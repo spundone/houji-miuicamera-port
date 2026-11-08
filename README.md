@@ -91,6 +91,7 @@ Everything below works on 6.8. Items marked (6.7 too) also work on 6.7.
 - **Filter adjustments are in JPEG photos only.** The sliders on a filter (Saturation, Tone, Soft light, Cold/Warm, Cyan/Magenta, Noise, Vignette) are added to the photo after it's saved, with the same code as the viewfinder. HEIF photos, photos with a watermark and photos over 52MP still come out without them.
 - **HDR and Dolby Vision are separate.** Dolby Vision records 10-bit HLG; the HDR tile merges exposures but records 8-bit SDR unless Dolby Vision is on too.
 - **The CN build's China-only extras stay on.** Only the consent check is redirected. The camera shows Xiaomi's terms on first launch.
+- **The camera shows a wrong name (such as 初一) or the old icon** in the launcher, App info or Recents when those apps have KernelSU's "Umount modules" on: they read the ROM's old camera APK with the new one's label and icon. The installer turns it off for them on KernelSU Next; on official KernelSU and forks such as ReSukiSU, turn it off by hand for your launcher (and Settings and System UI), or turn off "Umount modules by default".
 - **Switching camera builds** can close the camera with "invalid module index". Clear its data once (`pm clear com.android.camera`).
 
 ## Build

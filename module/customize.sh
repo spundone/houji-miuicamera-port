@@ -202,10 +202,19 @@ clear_camera_package_cache
 
 # KernelSU hides module files from apps unless their profile says otherwise; the camera would
 # then run its old APK against the new one's manifest and close (ClassNotFoundException).
-# KernelSU Next sets that from here; official KernelSU's ksud can't, so it's done by hand.
+# KernelSU Next sets that from here; official KernelSU's ksud (and forks such as ReSukiSU) can't,
+# so it's done by hand. Apps that show the camera (launcher, Settings, SystemUI's recents) need
+# it too: with module files hidden they read the ROM's old camera APK with the new one's label
+# and icon ids, and show a wrong name (such as 初一) and the old icon.
 if [ "$KSU" = "true" ] && ! set_profile com.android.camera false; then
-    ui_print "! Set the Camera's KernelSU profile by hand, or it will close on start:"
-    ui_print "  KernelSU > Superuser > (show system apps) > Camera > turn off 'Umount modules'"
+    ui_print "! Set these KernelSU profiles by hand: Superuser > (show system apps) > app >"
+    ui_print "  turn off 'Umount modules'"
+    ui_print "  - Camera: without it the camera closes on start"
+    home=$(cat "$MODPATH/launcher" 2>/dev/null)
+    [ -n "$home" ] && ui_print "  - your launcher ($home): without it the camera shows a wrong name and icon"
+    if [ -d /data/adb/modules/MIUIGallery ] || [ -d "$MODPATH/gallery" ]; then
+        ui_print "  - Settings and System UI: the same, in App info and Recents"
+    fi
     ui_print "  (or KernelSU > Settings > turn off 'Umount modules by default')"
 fi
 
