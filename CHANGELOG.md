@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Videos record sound again on AOSP ROMs. Video, Pro video and Movie clips had an audio track that was completely silent. houji's vendor declares Xiaomi's 4-mic audio zoom (`ro.vendor.audio.zoom.type=2`), so camera 6.8 asked for channels 2 and 3 of a 4-channel capture; AOSP's audio HAL only opens 2 channels, and the missing ones came back as zeros. The module now sets that property to 0 after boot on AOSP ROMs, and the camera records normal stereo. HyperOS is left alone. ROM builds get the same fix as an APK patch (`audio-zoom-type`), since they don't run the module's scripts.
+
 ## 1.9.4
 
 - Continuous zoom works in Pro video (and Video) again with 50M switched on in Pro photo. The 50MP lens fixes read Pro's 50M setting whatever the mode and held the main camera at 1x; they now act only in Photo and Pro photo.

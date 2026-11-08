@@ -71,6 +71,10 @@ With the codec recorder on, the switch works: the log shows `runContinuesVideoRe
 
 `MiMediaCodecRecorder` configures Qualcomm's HEVC encoder with `vendor.qti-ext-enc-nal-length-bs.num-bytes=4`, asking for length-prefixed NAL units. HyperOS's `MPEG4Writer` handles that; AOSP's needs Annex-B start codes (`csd0 doesn't start with a start code`, then `Video track stopped with an error`), so files came out with audio only. The module removes the NAL-length keys (Qualcomm, MediaTek and generic variants) in `MediaCodec.configure` and `setParameters` for video encoders. Verified with valid files in 720p30, 1080p30/60, 4K24/30/60.
 
+### Silent audio: the 4-channel capture
+
+Clips came out with an AAC track at a flat -91 dB. AudioFlinger's input thread showed real signal from the back mic (about -25 dB), so the zeros were added between the HAL and the camera. `AiAudioController.e()` turns on `MediaRecorderParameter.mIsAudio4Ch` in modes 162, 164, 180 and 227 when `ro.vendor.audio.zoom.type` is 2, which houji's vendor sets. With it on, `iq.f` builds the `AudioRecord` format with channel index mask `0xC` (channels 2 and 3; it first looks for HyperOS's `AudioFormat.CHANNEL_INDEX_MASK_4`, which AOSP lacks, then uses 12 anyway). AOSP's HAL opens the camcorder input as 2 channels, so those indexes are empty and AudioFlinger fills them with silence. `service.sh` sets the property to 0 after boot on AOSP ROMs; the camera then asks for plain stereo (`chan_index=0x0`). Verified: a 6 s Video clip at 1080p30 with -35 dB mean and -11.6 dB peak audio.
+
 ## 10. Dolby Vision in the viewfinder, and on the front camera
 
 The Dolby component, `t2.c` ("True Colour"), has two keys: a Settings switch (`pref_true_colour_video_mode_setting_key`) and quick-menu keys per mode (`pref_true_colour_video_mode_menu_key`, plus Pro video, Slow motion and Super night variants). `getKey` picks the menu keys when device flag `h3` is set, as on the 17 Ultra. All 25 readers of `h3` are Dolby-related, so the module turns it on.

@@ -130,6 +130,14 @@ add("street-mode", "Entry.hookStreetMode", "low",
     {"class": "Lcom/android/camera/features/mode/street/StreetModuleEntry;", "name": "support", "proto": "()Z"},
     {"type": "return", "value": True})
 
+# houji's vendor sets ro.vendor.audio.zoom.type=2 (4-mic audio zoom). With it, Video, Pro video
+# and Movie record channels 2 and 3 of a 4-channel capture, which AOSP's audio HAL doesn't open:
+# silent audio. The module resets the property in service.sh; a ROM build answers "not type 2".
+add("audio-zoom-type", "service.sh (ro.vendor.audio.zoom.type)", "low",
+    {"class": "LPe/b;", "name": "A0", "proto": "()Z", "static": True,
+     "has": ['"ro.vendor.audio.zoom.type"']},
+    {"type": "return", "value": False})
+
 add("lens-sat-check", "Entry.hookVideoLensSwitching (U1)", "medium",
     {"class": "Lcom/android/camera/data/data/i;", "name": "U1", "proto": "(ILjava/lang/String;)Z",
      "static": True, "has": ['"getVideoSatSupportedQualities  = "']},

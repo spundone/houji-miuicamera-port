@@ -1030,6 +1030,24 @@
    }
   },
   {
+   "id": "audio-zoom-type",
+   "hook": "service.sh (ro.vendor.audio.zoom.type)",
+   "effort": "low",
+   "find": {
+    "class": "LPe/b;",
+    "name": "A0",
+    "proto": "()Z",
+    "static": true,
+    "has": [
+     "\"ro.vendor.audio.zoom.type\""
+    ]
+   },
+   "action": {
+    "type": "return",
+    "value": false
+   }
+  },
+  {
    "id": "lens-sat-check",
    "hook": "Entry.hookVideoLensSwitching (U1)",
    "effort": "medium",

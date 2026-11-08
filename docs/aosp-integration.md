@@ -30,9 +30,10 @@ Users coming from the KernelSU module should remove it and the LSPosed module, t
 
 ## Status
 
-- `patch-apk.sh` applies all 89 patches to 6.8.002090.2 in under a minute, decodes the result again and checks every generated method, redirected call and added field is in it.
+- `patch-apk.sh` applies all 92 patches to 6.8.002090.2 in under a minute, decodes the result again and checks every generated method, redirected call and added field is in it.
 - The output is the original APK with only its dex files replaced, plus the helper dex. (Repacking everything through apktool merged resource files whose obfuscated names differ only in case on macOS, and the camera crashed.)
 - On the phone (Infinity X 4.0, Android 17), the patched APK runs in place of the 6.4 camera, signed with a test key and installed by the KernelSU-only zips. Checked: Photo on all lenses, 50MP switching, Pro 50MP RAW on the telephoto (8160x6144 DNG), Portrait 2.6x, Short film, Essential Moment (M3, M10R), Ultra HDR, haptics.
+- Video audio: houji's vendor declares 4-mic audio zoom (`ro.vendor.audio.zoom.type=2`), which makes the camera record silent audio on AOSP's HAL. The `audio-zoom-type` patch answers "not type 2", the same state the module gets from `service.sh`, checked on the phone in Video, Pro video and Movie. The patched APK itself hasn't been recorded with yet.
 - Not yet tested: a full ROM build with the device tree, and the camera running as `platform_app`.
 
 ## How ROMs ship Xiaomi's camera
