@@ -59,6 +59,10 @@ The LSPosed module hooks `CameraDeviceImpl.createCaptureRequest` in the camera p
 
 With Dolby Vision on, `j.U1` also asks the "True Colour" component, `t2.c.n(2, quality)`, whether the HAL's Dolby config allows multi-lens video at that quality. houji's config leaves out 4K30, so the lens locked, even though the `supportedRange` mask has the HDR bit for 4K30 (`0x800`). HDR10 (`t2.a.o`, `t2.b.n`) bails out the same way. The module answers those three checks only while `U1` is running, using a thread-local depth counter, so `U1` falls through to the mask. Recording 4K30 Dolby Vision then keeps all four lenses, and the file stays Dolby Vision profile 8.4.
 
+### Dolby Vision brightness in Video mode
+
+Same scene, back to back, 1080p30: Dolby Vision in Pro video (camera 2, a single camera) put the white flowers at about 213 nits (HLG reference white is 203), while Video mode (camera 5, the logical multi-camera used for lens switching) put them at about 105, a stop darker. Its sensor gain was higher (ISO 1600 against 1380, both 1/50 s, exposure compensation 0), so the HAL's Dolby tone mapping on the logical camera is what's darker; SDR clips from the two modes matched, and neither HDR (Auto or off) nor resolution (1080p, 4K) changed it. `DolbyExposure` wraps the exposure compensation index (`l9.n0.m1`): while the True Colour component (`s2.c.p()`, Dolby Vision) is on and the camera's capabilities include `LOGICAL_MULTI_CAMERA`, it adds 4 steps (+0.67 EV at houji's 1/6 EV step), clamped to the camera's range. After it, Video mode's median was 65 nits against Pro video's 62 on the same scene.
+
 ## 8. Front camera while recording
 
 The camera offers this only when the device profile says so. `Common.z6()` checks for one model, `com.mi.device.Annibale`. Tapping the switch pauses the recorder through `tq.o.c(IntFunction)` and waits for a "paused" callback before reopening the other camera. Only `MiMediaCodecRecorder` (`tq.s`) sends that callback, and the camera picks it when `w5()` is true.

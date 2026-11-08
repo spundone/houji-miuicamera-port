@@ -59,6 +59,7 @@ public class Entry implements IXposedHookLoadPackage {
         UltraHdRaw.hook(lp.classLoader, build);
         UltraHdrJpeg.hook(lp.classLoader, build);
         StyleAdjust.hook(lp.classLoader, build);
+        DolbyExposure.hook(lp.classLoader, build);
         LeicaLegendary.hook(lp.classLoader, build);
         VideoFilterLuts.hook(lp.classLoader, build);
         OpenGate.hook(lp.classLoader, build);

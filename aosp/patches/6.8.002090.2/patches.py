@@ -399,6 +399,13 @@ add("style-script", "StyleAdjust (filter adjustments in the saved photo)", "medi
                                 "pass": ["result"]}]},
     [{"class": "Lcom/xiaomi/milab/filtersdk/CandySDK;", "has": ["processBitmap"]}])
 
+add("dolby-exposure", "DolbyExposure (Dolby Vision on the logical camera a stop darker)", "medium",
+    {"class": "Ll9/n0;", "name": "m1", "proto": "(ILl9/g;Ll9/j0;)I", "static": True,
+     "has": ['"applyExposureCompensation: EV = "']},
+    {"type": "wrap", "after": [{"helper": H + "DolbyExposure;->afterCompensation(ILjava/lang/Object;)I",
+                                "pass": ["result", "arg1"]}]},
+    [{"class": "Ls2/c;", "has": ['"ComponentConfigTrueColour"']}])
+
 add("haptics-strategy", "CameraHaptics (vibrator strategy)", "medium",
     {"class": "LRr/d;", "name": "b", "proto": "()LRr/d;", "static": True},
     {"type": "wrap", "after": [{"helper": H + "CameraHaptics;->fillStrategy(Ljava/lang/Object;Ljava/lang/String;"

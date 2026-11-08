@@ -2507,6 +2507,40 @@
    ]
   },
   {
+   "id": "dolby-exposure",
+   "hook": "DolbyExposure (Dolby Vision on the logical camera a stop darker)",
+   "effort": "medium",
+   "find": {
+    "class": "Ll9/n0;",
+    "name": "m1",
+    "proto": "(ILl9/g;Ll9/j0;)I",
+    "static": true,
+    "has": [
+     "\"applyExposureCompensation: EV = \""
+    ]
+   },
+   "action": {
+    "type": "wrap",
+    "after": [
+     {
+      "helper": "Ldev/spundone/xcam17/aosp/DolbyExposure;->afterCompensation(ILjava/lang/Object;)I",
+      "pass": [
+       "result",
+       "arg1"
+      ]
+     }
+    ]
+   },
+   "check": [
+    {
+     "class": "Ls2/c;",
+     "has": [
+      "\"ComponentConfigTrueColour\""
+     ]
+    }
+   ]
+  },
+  {
    "id": "haptics-strategy",
    "hook": "CameraHaptics (vibrator strategy)",
    "effort": "medium",

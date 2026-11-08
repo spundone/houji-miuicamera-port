@@ -6,6 +6,7 @@
 
 - Filter adjustments (Saturation, Tone, Soft light, Cold/Warm, Cyan/Magenta, Noise, Vignette) are now in saved JPEG photos, not only the viewfinder. houji's camera service ignores them, so the module adds them to the photo after it's saved, with the camera's own filter library, the same code that draws the viewfinder. HEIF photos, watermarked photos and photos over 52MP still go without. Leica Authentic's vignette is part of houji's own Authentic look; a negative Vignette now lightens it in the photo.
 - The estimated Ultra HDR gain map is gentler. It boosted everything above 72% brightness by up to 2 stops, so a white wall or sky made the whole photo glare on an HDR screen. Highlights now get up to 1.5 stops, less the more of the frame is bright, which keeps a photo within about 1.25 times its normal brightness.
+- Dolby Vision in Video mode is no longer about a stop darker than in Pro video. Video mode records through houji's multi-lens camera, whose Dolby Vision output is darker for the same scene; the camera now adds +0.67 EV there while Dolby Vision is on, which brings it in line with Pro video. SDR video and Pro video are unchanged.
 
 ## 1.9.4
 
