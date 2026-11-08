@@ -4,6 +4,9 @@
 
 - Videos record sound again on AOSP ROMs. Video, Pro video and Movie clips had an audio track that was completely silent. houji's vendor declares Xiaomi's 4-mic audio zoom (`ro.vendor.audio.zoom.type=2`), so camera 6.8 asked for channels 2 and 3 of a 4-channel capture; AOSP's audio HAL only opens 2 channels, and the missing ones came back as zeros. The module now sets that property to 0 after boot on AOSP ROMs, and the camera records normal stereo. HyperOS is left alone. ROM builds get the same fix as an APK patch (`audio-zoom-type`), since they don't run the module's scripts.
 
+- Filter adjustments (Saturation, Tone, Soft light, Cold/Warm, Cyan/Magenta, Noise, Vignette) are now in saved JPEG photos, not only the viewfinder. houji's camera service ignores them, so the module adds them to the photo after it's saved, with the camera's own filter library, the same code that draws the viewfinder. HEIF photos, watermarked photos and photos over 52MP still go without. Leica Authentic's vignette is part of houji's own Authentic look; a negative Vignette now lightens it in the photo.
+- The estimated Ultra HDR gain map is gentler. It boosted everything above 72% brightness by up to 2 stops, so a white wall or sky made the whole photo glare on an HDR screen. Highlights now get up to 1.5 stops, less the more of the frame is bright, which keeps a photo within about 1.25 times its normal brightness.
+
 ## 1.9.4
 
 - Continuous zoom works in Pro video (and Video) again with 50M switched on in Pro photo. The 50MP lens fixes read Pro's 50M setting whatever the mode and held the main camera at 1x; they now act only in Photo and Pro photo.

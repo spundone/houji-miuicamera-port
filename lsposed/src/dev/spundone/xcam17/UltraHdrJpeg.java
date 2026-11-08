@@ -30,11 +30,18 @@ import de.robv.android.xposed.XposedBridge;
  * map are left alone.
  */
 final class UltraHdrJpeg {
-    /** Highest highlight boost, in stops (log2 of the gain). */
-    static final float MAX_STOPS = 2f;
+    /**
+     * Highlight boost, in stops (log2 of the gain): MAX_STOPS when only small highlights are
+     * bright, less the more of the frame is above RAMP_START (a white wall or a sky), down to
+     * MIN_STOPS. A boost of 2 stops on everything above 72% luminance lit whole frames up to
+     * 2.8 times brighter on an HDR screen; this keeps a frame within about 1.25 times.
+     */
+    static final float MAX_STOPS = 1.5f;
+    static final float MIN_STOPS = 0.5f;
+    static final float BRIGHT_AREA_WEIGHT = 1.6f;
     /** sRGB luminance where the boost starts, and where it reaches its full value. */
-    static final float RAMP_START = 0.72f;
-    static final float RAMP_END = 0.98f;
+    static final float RAMP_START = 0.80f;
+    static final float RAMP_END = 1.0f;
     static final int GAIN_MAP_SAMPLE = 4;
     static final int GAIN_MAP_QUALITY = 85;
 
@@ -84,14 +91,21 @@ final class UltraHdrJpeg {
         }
         byte[] out;
         if (isPlainJpeg(photo)) {
-            out = withGainMap(photo);
+            // Filter adjustments first, so the gain map follows the adjusted photo.
+            byte[] styled = StyleAdjust.apply(photo);
+            out = withGainMap(styled);
+            if (out == null || !decodesWithGainMap(out)) {
+                Entry.log("ultra hdr: " + uri + ": gain map not recognised, photo left without one");
+                if (styled == photo) return;
+                out = styled;
+            }
         } else if (HeifGainMap.isPlainHeif(photo) && HeifGainMap.enabled()) {
             out = HeifGainMap.withGainMap(photo);
+            if (out == null || !decodesWithGainMap(out)) {
+                Entry.log("ultra hdr: " + uri + ": gain map not recognised, photo left as is");
+                return;
+            }
         } else {
-            return;
-        }
-        if (out == null || !decodesWithGainMap(out)) {
-            Entry.log("ultra hdr: " + uri + ": gain map not recognised, photo left as is");
             return;
         }
         try (OutputStream os = resolver.openOutputStream(uri, "wt")) {
@@ -153,7 +167,21 @@ final class UltraHdrJpeg {
         return assemble(photo, gainMap);
     }
 
-    /** Grey gain map values, one per pixel: 0 leaves a pixel as it is, 255 brightens it by MAX_STOPS. */
+    /** The photo's boost in stops: MAX_STOPS, less for each part of the frame above RAMP_START. */
+    static float stops(Bitmap src, int w, int h) {
+        int[] px = new int[w * h];
+        src.getPixels(px, 0, w, 0, 0, w, h);
+        int bright = 0;
+        for (int c : px) {
+            float y = (0.2126f * ((c >> 16) & 0xFF) + 0.7152f * ((c >> 8) & 0xFF) + 0.0722f * (c & 0xFF)) / 255f;
+            if (y > RAMP_START) bright++;
+        }
+        float frac = px.length == 0 ? 0f : (float) bright / px.length;
+        float s = MAX_STOPS * (1f - BRIGHT_AREA_WEIGHT * frac);
+        return Math.round(Math.max(MIN_STOPS, Math.min(MAX_STOPS, s)) * 100f) / 100f;
+    }
+
+    /** Grey gain map values, one per pixel: 0 leaves a pixel as it is, 255 brightens it by the photo's stops. */
     static byte[] gainValues(Bitmap src, int w, int h) {
         int[] px = new int[w * h];
         src.getPixels(px, 0, w, 0, 0, w, h);
@@ -169,6 +197,7 @@ final class UltraHdrJpeg {
 
     static byte[] gainMapJpeg(Bitmap src) {
         int w = src.getWidth(), h = src.getHeight();
+        float stops = stops(src, w, h);
         byte[] g = gainValues(src, w, h);
         int[] px = new int[w * h];
         for (int i = 0; i < px.length; i++) {
@@ -179,11 +208,11 @@ final class UltraHdrJpeg {
         ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
         map.compress(Bitmap.CompressFormat.JPEG, GAIN_MAP_QUALITY, jpeg);
         map.recycle();
-        return insertAfterSoi(jpeg.toByteArray(), app1Xmp(gainMapXmp()));
+        return insertAfterSoi(jpeg.toByteArray(), app1Xmp(gainMapXmp(stops)));
     }
 
-    static String gainMapXmp() {
-        String stops = Float.toString(MAX_STOPS);
+    static String gainMapXmp(float maxStops) {
+        String stops = Float.toString(maxStops);
         return "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\"><rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">"
                 + "<rdf:Description rdf:about=\"\" xmlns:hdrgm=\"http://ns.adobe.com/hdr-gain-map/1.0/\""
                 + " hdrgm:Version=\"1.0\" hdrgm:GainMapMin=\"0\" hdrgm:GainMapMax=\"" + stops + "\""

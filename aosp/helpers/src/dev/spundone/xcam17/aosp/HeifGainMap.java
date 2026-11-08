@@ -73,26 +73,28 @@ final class HeifGainMap {
         Bitmap small = BitmapFactory.decodeByteArray(photo, 0, photo.length, o);
         if (small == null) return null;
         Bitmap scaled = Bitmap.createScaledBitmap(small, w, h, true);
+        float stops = UltraHdrJpeg.stops(scaled, w, h);
         byte[] gain = UltraHdrJpeg.gainValues(scaled, w, h);
         if (scaled != small) scaled.recycle();
         small.recycle();
 
         Hevc coded = Hevc.encodeGrey(gain, w, h);
         if (coded == null) return null;
-        return heif.addGainMap(coded, w, h, tmapMetadata());
+        return heif.addGainMap(coded, w, h, tmapMetadata(stops));
     }
 
     /** ISO 21496-1 metadata, one channel, in the units the JPEG hdrgm XMP uses (log2 stops). */
-    static byte[] tmapMetadata() {
+    static byte[] tmapMetadata(float stops) {
+        int hundredths = Math.round(stops * 100f);
         ByteBuffer b = ByteBuffer.allocate(62);
         b.put((byte) 0);                 // version
         b.putShort((short) 0);           // minimum_version
         b.putShort((short) 0);           // writer_version
         b.put((byte) 0x40);              // single channel, use_base_colour_space
         b.putInt(0).putInt(1);           // base_hdr_headroom 0
-        b.putInt((int) UltraHdrJpeg.MAX_STOPS).putInt(1); // alternate_hdr_headroom
+        b.putInt(hundredths).putInt(100); // alternate_hdr_headroom
         b.putInt(0).putInt(1);           // gain_map_min
-        b.putInt((int) UltraHdrJpeg.MAX_STOPS).putInt(1); // gain_map_max
+        b.putInt(hundredths).putInt(100); // gain_map_max
         b.putInt(1).putInt(1);           // gamma
         b.putInt(1).putInt(64);          // base_offset
         b.putInt(1).putInt(64);          // alternate_offset

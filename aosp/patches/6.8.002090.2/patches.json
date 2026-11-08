@@ -2474,6 +2474,39 @@
    }
   },
   {
+   "id": "style-script",
+   "hook": "StyleAdjust (filter adjustments in the saved photo)",
+   "effort": "medium",
+   "find": {
+    "class": "LTu/r$a;",
+    "name": "a",
+    "proto": "(LMu/g;)Ljava/lang/String;",
+    "static": true,
+    "has": [
+     "\"@StyleAdjustEffect;Algos=\""
+    ]
+   },
+   "action": {
+    "type": "wrap",
+    "after": [
+     {
+      "helper": "Ldev/spundone/xcam17/aosp/StyleAdjust;->afterViewfinderScript(Ljava/lang/String;)Ljava/lang/String;",
+      "pass": [
+       "result"
+      ]
+     }
+    ]
+   },
+   "check": [
+    {
+     "class": "Lcom/xiaomi/milab/filtersdk/CandySDK;",
+     "has": [
+      "processBitmap"
+     ]
+    }
+   ]
+  },
+  {
    "id": "haptics-strategy",
    "hook": "CameraHaptics (vibrator strategy)",
    "effort": "medium",

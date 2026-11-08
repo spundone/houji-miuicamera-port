@@ -392,6 +392,13 @@ add("ultra-hdr", "UltraHdrJpeg + HeifGainMap (from 1b4f7b6)", "high",
     {"type": "wrap", "after": [{"helper": H + "UltraHdrJpeg;->afterNewImage(Landroid/net/Uri;Z)V",
                                 "pass": ["arg0", "arg4"]}]})
 
+add("style-script", "StyleAdjust (filter adjustments in the saved photo)", "medium",
+    {"class": "LTu/r$a;", "name": "a", "proto": "(LMu/g;)Ljava/lang/String;", "static": True,
+     "has": ['"@StyleAdjustEffect;Algos="']},
+    {"type": "wrap", "after": [{"helper": H + "StyleAdjust;->afterViewfinderScript(Ljava/lang/String;)Ljava/lang/String;",
+                                "pass": ["result"]}]},
+    [{"class": "Lcom/xiaomi/milab/filtersdk/CandySDK;", "has": ["processBitmap"]}])
+
 add("haptics-strategy", "CameraHaptics (vibrator strategy)", "medium",
     {"class": "LRr/d;", "name": "b", "proto": "()LRr/d;", "static": True},
     {"type": "wrap", "after": [{"helper": H + "CameraHaptics;->fillStrategy(Ljava/lang/Object;Ljava/lang/String;"

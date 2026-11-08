@@ -66,6 +66,7 @@ Each patch finds its method by class, name and prototype, and checks fingerprint
 | `VideoFilterLuts` | wrap `r2.a.getItems` | Medium |
 | `FillLight60` | wrap `l9.i0.L` and `f0` (before) | Medium |
 | `service.sh` audio fix (`ro.vendor.audio.zoom.type`) | return `false` from `Pe.b.A0()`, so Video, Pro video and Movie record stereo instead of channels 2 and 3 of a 4-channel capture | Low |
+| `StyleAdjust` | wrap `Tu.r$a.a` (after: keep the viewfinder's style script); the helper applies it to saved JPEGs with the app's CandySDK, from the Ultra HDR save callback | Medium |
 | `AudioParaStub` | not a patch: the stand-in class is compiled into the helper dex | Low |
 | `UltraHdLenses` | wrap 13 methods: the Ultra HD checks (`data.p.l0`, `X0` guarded), lens buttons and lists (`H4.p0.a`, `data.i.S`, `ZoomRatioToggleView.u`), the lens switch (`i9.g.M7`, guarded), snaps (`j9.e.B7`, `j9.t.n0`), the 1:1 ratio (`r2.T`, `r6.f0`) and the 1x zoom step (`l9.n0.l1`) | High |
 | `UltraHdrJpeg`, `HeifGainMap` (from 1b4f7b6) | wrap the image saver's new-image callback `l7.k.w`; HEIF gain maps only with `debug.xcam17.heic_ultrahdr=1` | High |
@@ -75,6 +76,6 @@ Each patch finds its method by class, name and prototype, and checks fingerprint
 | `LeicaLegendary` | add the port's two fields to the photo task `Sh.t` (instead of stand-in classes); wrap `Camera2Module.updateParallelTaskData` (after) and `t7.d.a` (before); flags `c3`, `b3`, `G` only with the port's files installed. The port's models are added to the app's resources with a `ResourcesLoader` instead of hooking `AssetManager`. Its notices stay in Chinese: they are the port's code, which isn't patched | High |
 | KernelSU swap, profile, package cache | not needed: the ROM ships the app | None |
 
-All 92 patches apply to 6.8.002090.2; see the status in [docs/aosp-integration.md](../docs/aosp-integration.md#status).
+All 93 patches apply to 6.8.002090.2; see the status in [docs/aosp-integration.md](../docs/aosp-integration.md#status).
 
 For Ultra HDR on HEIF photos in a ROM build, set `debug.xcam17.heic_ultrahdr=1` (for example in `system.prop`). It's off by default because macOS, ffmpeg and Google Photos backup refuse HEIF files with a gain map.
